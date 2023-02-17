@@ -6,10 +6,10 @@ from nodec import ControlLearner, ControlledSystem, ControlLoss
 
 
 class MountainCarLoss(ControlLoss):
-    def running_loss(self, times: torch.Tensor, trajectory: torch.Tensor):
+    def running_loss(self, times: torch.Tensor, trajectory: torch.Tensor, controls: torch.Tensor):
         return 0.1*torch.sum(trajectory**2)
 
-    def terminal_loss(self, T: torch.Tensor, xT: torch.Tensor):
+    def terminal_loss(self, T: torch.Tensor, xT: torch.Tensor, uT: torch.Tensor):
         return 0
 
 

@@ -6,11 +6,11 @@ from nodec import ControlLearner, ControlledSystem, ControlLoss
 
 
 class CartPoleLoss(ControlLoss):
-    def running_loss(self, times: torch.Tensor, trajectory: torch.Tensor):
+    def running_loss(self, times: torch.Tensor, trajectory: torch.Tensor, controls: torch.Tensor):
         theta = trajectory[:, :, 2]
         return torch.mean(theta**2, axis=0)
 
-    def terminal_loss(self, T: torch.Tensor, xT: torch.Tensor):
+    def terminal_loss(self, T: torch.Tensor, xT: torch.Tensor, uT: torch.Tensor):
         vT = xT[:, 1]
         thetaT = xT[:, 2]
         return 4 * thetaT**2 + vT**2
