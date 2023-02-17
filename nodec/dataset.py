@@ -17,7 +17,8 @@ class IntialPointsDataset(Dataset):
     def _generate_point(self) -> torch.Tensor:
         r1, r2 = self.ranges[:, 0], self.ranges[:, 1]
         point = (r1 - r2) * torch.rand(self.x_dim) + r2
-        return point
+        zero = torch.zeros(1)
+        return torch.cat([point, zero], axis=0)
     
     def __len__(self):
         return self.N

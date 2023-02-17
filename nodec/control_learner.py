@@ -29,11 +29,19 @@ class ControlLearner(pl.LightningModule):
             if time_span is not None
             else torch.linspace(0, 1, 2, dtype=torch.float32)
         )
+    
+    def differentiate_impulse(self, impulse: torch.Tensor) -> torch.Tensor:
+        dt = (self.time_span[-1] - self.time_span[0])/len(self.time_span)
+        tmp = (impulse - torch.cat((impulse[-1:], impulse[:-1]))) / dt
+        controls = torch.cat((tmp[1:2], tmp[1:]), dim=0)
+        
+        return controls
 
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        times, trajectory = self.ode.forward(x, self.time_span)
-        controls = torch.cat(self.system.control_buffer, axis=1)
-        self.system.control_buffer = []
+        times, trajectory_with_impulse = self.ode.forward(x, self.time_span)
+        trajectory = trajectory_with_impulse[:, :, :-1]
+        impulse = trajectory_with_impulse[:, :, -1:]
+        controls = self.differentiate_impulse(impulse)
 
         return times, trajectory, controls
 

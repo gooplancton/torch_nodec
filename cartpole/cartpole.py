@@ -58,7 +58,7 @@ controller = nn.Sequential(nn.Linear(4, 10), nn.Tanh(), nn.Linear(10, 1))
 system = CartPole(controller)
 loss = CartPoleLoss()
 learner = ControlLearner(
-    system, loss, 100, torch.linspace(0, 10, 10, dtype=torch.float32), {}
+    system, loss, 100, torch.linspace(0, 10, 100, dtype=torch.float32), {}
 )
 trainer = pl.Trainer(min_epochs=1, max_epochs=50)
 trainer.fit(learner)
