@@ -16,6 +16,23 @@ class CartPoleLoss(ControlLoss):
         return 4 * thetaT**2 + vT**2
 
 
+class CartPoleLossAlt(ControlLoss):
+    def running_loss(self, times: torch.Tensor, trajectory: torch.Tensor, controls: torch.Tensor):
+        pos = trajectory[:, :, 0]
+        theta = trajectory[:, :, 2]
+        return torch.mean(theta**2 + 0.1*(pos**2), axis=0)
+    
+    def terminal_loss(self, T: torch.Tensor, xT: torch.Tensor, uT: torch.Tensor):
+        vT = xT[:, 1]
+        thetaT = xT[:, 2]
+        return 4 * thetaT**2 + vT**2
+    
+    def extra_loss(self, times: torch.Tensor, trajectory: torch.Tensor, controls: torch.Tensor):
+        u = controls[:, :, 0]
+        # return 0.001*torch.max(controls**2, axis=0).values.squeeze(1)
+        return 0.001*torch.max(u**2, axis=0).values
+
+
 class CartPole(ControlledSystem):
     def __init__(self, controller, m_c=1.0, m_p=0.1, l=0.5, g=9.81):
         super().__init__(
@@ -56,7 +73,7 @@ class CartPole(ControlledSystem):
 
 controller = nn.Sequential(nn.Linear(4, 10), nn.Tanh(), nn.Linear(10, 1))
 system = CartPole(controller)
-loss = CartPoleLoss()
+loss = CartPoleLossAlt()
 learner = ControlLearner(
     system, loss, 100, torch.linspace(0, 10, 100, dtype=torch.float32), {}
 )

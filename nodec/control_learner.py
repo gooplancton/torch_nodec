@@ -39,8 +39,9 @@ class ControlLearner(pl.LightningModule):
 
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         times, trajectory_with_impulse = self.ode.forward(x, self.time_span)
-        trajectory = trajectory_with_impulse[:, :, :-1]
-        impulse = trajectory_with_impulse[:, :, -1:]
+        x_dim = self.system.x_dim
+        trajectory = trajectory_with_impulse[:, :, :x_dim]
+        impulse = trajectory_with_impulse[:, :, x_dim:]
         controls = self.differentiate_impulse(impulse)
 
         return times, trajectory, controls
