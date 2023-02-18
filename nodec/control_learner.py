@@ -50,7 +50,7 @@ class ControlLearner(pl.LightningModule):
         return torch.optim.Adam(self.parameters(), lr=0.01)
 
     def train_dataloader(self):
-        ds = IntialPointsDataset(self.system.x0_ranges, self.n_trajectories, None)
+        ds = IntialPointsDataset(self.system.x0_ranges, self.system.control_dim, self.n_trajectories, None)
         trainloader = DataLoader(ds, num_workers=4, batch_size=2)
         return trainloader
 

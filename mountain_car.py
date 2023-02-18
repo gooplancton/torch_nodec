@@ -30,13 +30,14 @@ class MountainCar(ControlledSystem):
         return x_prime
 
 
-controller = nn.Sequential(
-    nn.Linear(2, 10),
-    nn.Tanh(),
-    nn.Linear(10, 1)
-)
-system = MountainCar(controller)
-loss = MountainCarLoss()
-learner = ControlLearner(system, loss, 1000, torch.linspace(0, 10, 100, dtype=torch.float32), {})
-trainer = pl.Trainer(min_epochs=1, max_epochs=5)
-trainer.fit(learner)
+if __name__ == "__main__":
+    controller = nn.Sequential(
+        nn.Linear(2, 10),
+        nn.Tanh(),
+        nn.Linear(10, 1)
+    )
+    system = MountainCar(controller)
+    loss = MountainCarLoss()
+    learner = ControlLearner(system, loss, 1000, torch.linspace(0, 10, 100, dtype=torch.float32), {})
+    trainer = pl.Trainer(min_epochs=1, max_epochs=5)
+    trainer.fit(learner)

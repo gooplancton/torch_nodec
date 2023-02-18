@@ -71,11 +71,12 @@ class CartPole(ControlledSystem):
         return x_dot
 
 
-controller = nn.Sequential(nn.Linear(4, 10), nn.Tanh(), nn.Linear(10, 1))
-system = CartPole(controller)
-loss = CartPoleLossAlt()
-learner = ControlLearner(
-    system, loss, 100, torch.linspace(0, 10, 100, dtype=torch.float32), {}
-)
-trainer = pl.Trainer(min_epochs=1, max_epochs=50)
-trainer.fit(learner)
+if __name__ == "__main__":
+    controller = nn.Sequential(nn.Linear(4, 10), nn.Tanh(), nn.Linear(10, 1))
+    system = CartPole(controller)
+    loss = CartPoleLossAlt()
+    learner = ControlLearner(
+        system, loss, 100, torch.linspace(0, 10, 100, dtype=torch.float32), {}
+    )
+    trainer = pl.Trainer(min_epochs=1, max_epochs=50)
+    trainer.fit(learner)

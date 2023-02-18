@@ -3,11 +3,12 @@ import torch.nn as nn
 
 
 class ControlledSystem(nn.Module):
-    def __init__(self, controller: nn.Module, x0_ranges: torch.Tensor):
+    def __init__(self, controller: nn.Module, x0_ranges: torch.Tensor, control_dim: int = 1):
         super().__init__()
         self.controller = controller
         self.x0_ranges = x0_ranges
         self.x_dim = x0_ranges.shape[0]
+        self.control_dim = control_dim
 
     def dynamics(self, t: torch.Tensor, x: torch.Tensor, control: torch.Tensor) -> torch.Tensor:
         raise NotImplementedError()
