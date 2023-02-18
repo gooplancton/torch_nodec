@@ -8,12 +8,12 @@ from nodec import ControlLearner, ControlledSystem, ControlLoss
 class CartPoleLoss(ControlLoss):
     def running_loss(self, times: torch.Tensor, trajectory: torch.Tensor, controls: torch.Tensor):
         theta = trajectory[:, :, 2]
-        return torch.mean(theta**2, axis=0)
+        return -torch.mean(10*torch.cos(theta), axis=0)
 
     def terminal_loss(self, T: torch.Tensor, xT: torch.Tensor, uT: torch.Tensor):
         vT = xT[:, 1]
         thetaT = xT[:, 2]
-        return 4 * thetaT**2 + vT**2
+        return -(4 * torch.cos(thetaT) + vT**2)
 
 
 class CartPoleLossAlt(ControlLoss):
@@ -34,14 +34,14 @@ class CartPoleLossAlt(ControlLoss):
 
 
 class CartPole(ControlledSystem):
-    def __init__(self, controller, m_c=1.0, m_p=0.1, l=0.5, g=9.81):
+    def __init__(self, controller, m_c=1.0, m_p=0.1, l=0.5, g=9.81, start_inverted=False):
         super().__init__(
             controller,
             torch.tensor(
                 [
                     [-0.05, 0.05],
                     [-0.05, 0.05],
-                    [-0.05, 0.05],
+                    [-0.05, 0.05] if not start_inverted else [torch.pi, torch.pi],
                     [-0.05, 0.05],
                 ]
             ).float(),
@@ -73,8 +73,8 @@ class CartPole(ControlledSystem):
 
 if __name__ == "__main__":
     controller = nn.Sequential(nn.Linear(4, 10), nn.Tanh(), nn.Linear(10, 1))
-    system = CartPole(controller)
-    loss = CartPoleLossAlt()
+    system = CartPole(controller, start_inverted=True)
+    loss = CartPoleLoss()
     learner = ControlLearner(
         system,
         loss,
