@@ -76,7 +76,12 @@ if __name__ == "__main__":
     system = CartPole(controller)
     loss = CartPoleLossAlt()
     learner = ControlLearner(
-        system, loss, 100, torch.linspace(0, 10, 100, dtype=torch.float32), {}
+        system,
+        loss,
+        n_trajectories=100,
+        batch_size=5,
+        time_span=torch.linspace(0, 10, 100, dtype=torch.float32),
+        ode_params={},
     )
-    trainer = pl.Trainer(min_epochs=1, max_epochs=50)
+    trainer = pl.Trainer(min_epochs=1, max_epochs=2)
     trainer.fit(learner)

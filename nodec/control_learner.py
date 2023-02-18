@@ -16,6 +16,7 @@ class ControlLearner(pl.LightningModule):
         system: ControlledSystem,
         loss: ControlLoss,
         n_trajectories: int = 10,
+        batch_size: int = 2,
         time_span: Optional[torch.Tensor] = None,
         ode_params: Optional[dict] = None,
     ) -> None:
@@ -23,6 +24,7 @@ class ControlLearner(pl.LightningModule):
         self.system = system
         self.loss = loss
         self.n_trajectories = n_trajectories
+        self.batch_size = batch_size
         self.ode = NeuralODE(self.system, **ode_params)
         self.time_span = (
             time_span
@@ -51,7 +53,7 @@ class ControlLearner(pl.LightningModule):
 
     def train_dataloader(self):
         ds = IntialPointsDataset(self.system.x0_ranges, self.system.control_dim, self.n_trajectories, None)
-        trainloader = DataLoader(ds, num_workers=4, batch_size=2)
+        trainloader = DataLoader(ds, num_workers=4, batch_size=self.batch_size)
         return trainloader
 
     def training_step(self, x0, batch_idx):
