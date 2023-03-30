@@ -19,6 +19,7 @@ class ControlLearner(pl.LightningModule):
         batch_size: int = 2,
         time_span: Optional[torch.Tensor] = None,
         ode_params: Optional[dict] = None,
+        learning_rate: float = 0.1,
     ) -> None:
         super().__init__()
         self.system = system
@@ -26,6 +27,7 @@ class ControlLearner(pl.LightningModule):
         self.n_trajectories = n_trajectories
         self.batch_size = batch_size
         self.ode = NeuralODE(self.system, **ode_params)
+        self.lr = learning_rate
         self.time_span = (
             time_span
             if time_span is not None
@@ -49,7 +51,7 @@ class ControlLearner(pl.LightningModule):
         return times, trajectory, controls
 
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=0.01)
+        return torch.optim.Adam(self.parameters(), lr=self.lr)
 
     def train_dataloader(self):
         ds = IntialPointsDataset(self.system.x0_ranges, self.system.control_dim, self.n_trajectories, None)

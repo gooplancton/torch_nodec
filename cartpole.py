@@ -1,8 +1,9 @@
 import torch
+import numpy as np
 import torch.nn as nn
-import pytorch_lightning as pl
 
 from nodec import ControlLearner, ControlledSystem, ControlLoss
+from visualization import train_and_plot_state_trajectory
 
 
 class CartPoleLoss(ControlLoss):
@@ -13,7 +14,12 @@ class CartPoleLoss(ControlLoss):
     def terminal_loss(self, T: torch.Tensor, xT: torch.Tensor, uT: torch.Tensor):
         vT = xT[:, 1]
         thetaT = xT[:, 2]
-        return -(4 * torch.cos(thetaT) + vT**2)
+        return -4 * torch.cos(thetaT) # + vT**2
+
+    def extra_loss(self, times: torch.Tensor, trajectory: torch.Tensor, controls: torch.Tensor):
+        u = controls[:, :, 0]
+        # return 0.001*torch.max(controls**2, axis=0).values.squeeze(1)
+        return 0.1*torch.mean(u**2, axis=0)
 
 
 class CartPoleLossAlt(ControlLoss):
@@ -78,10 +84,10 @@ if __name__ == "__main__":
     learner = ControlLearner(
         system,
         loss,
-        n_trajectories=100,
+        n_trajectories=1000,
         batch_size=5,
-        time_span=torch.linspace(0, 10, 100, dtype=torch.float32),
+        time_span=torch.linspace(0, 2, 100, dtype=torch.float32),
         ode_params={},
     )
-    trainer = pl.Trainer(min_epochs=1, max_epochs=2)
-    trainer.fit(learner)
+    train_and_plot_state_trajectory(learner, 1, 2, 2, True, np.cos, "t", "cos(theta)", "./cartpole2.png")
+

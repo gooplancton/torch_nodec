@@ -6,6 +6,7 @@ __pycache__/
 # C extensions
 *.so
 
+
 # Distribution / packaging
 .Python
 build/
@@ -167,3 +168,4 @@ core.*
 .ipynb_checkpoints
 .mypy_cache
 *.b
+*.png
